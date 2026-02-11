@@ -6,13 +6,14 @@ import Room from "./pages/Room";
 function App() {
   const [roomId, setRoomId] = useState(null);
   const [name, setName] = useState("");
+  const [isHost, setIsHost] = useState(false);
 
   return (
     <>
       {!roomId ? (
-        <Home setRoomId={setRoomId} setName={setName} />
+        <Home setRoomId={setRoomId} setName={setName} setIsHost={setIsHost} />
       ) : (
-        <Room roomId={roomId} name={name} />
+        <Room roomId={roomId} name={name} isHost={isHost} />
       )}
     </>
   );

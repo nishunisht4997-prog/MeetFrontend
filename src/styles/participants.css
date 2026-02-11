@@ -202,3 +202,68 @@
     font-size: 11px;
   }
 }
+
+/* Waiting room styles */
+.waiting-participants-section {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 16px;
+  background-color: #fff8e1;
+}
+
+.waiting-participants-section h4 {
+  margin: 0 0 12px 0;
+  color: #f57c00;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.waiting-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.waiting-participant-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.waiting-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.accept-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.accept-btn:hover {
+  background-color: #45a049;
+}
+
+.reject-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.reject-btn:hover {
+  background-color: #da190b;
+}

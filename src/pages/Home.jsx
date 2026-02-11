@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createMeeting } from "../api/meetingApi";
 
-function Home({ setRoomId, setName }) {
+function Home({ setRoomId, setName, setIsHost }) {
   const [joinRoomId, setJoinRoomId] = useState("");
   const [participantName, setParticipantName] = useState("");
   const [error, setError] = useState("");
@@ -18,6 +18,7 @@ function Home({ setRoomId, setName }) {
     }
     setError("");
     setName(participantName);
+    setIsHost(true);
     const room = await createMeeting();
     setCreatedRoomId(room);
     setIsModalOpen(true);

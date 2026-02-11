@@ -9,7 +9,7 @@ import VideoEffects from "../components/VideoEffects";
 import { createPeer } from "../webrtc/peer";
 import "../styles/room.css";
 
-function Room({ roomId, name }) {
+function Room({ roomId, name, isHost }) {
   const [stream, setStream] = useState(null);
   const [socket, setSocket] = useState(null);
   const peerRef = useRef(null);
@@ -26,6 +26,10 @@ function Room({ roomId, name }) {
   const [showParticipants, setShowParticipants] = useState(false);
   const [showRoomInfo, setShowRoomInfo] = useState(false);
   const [showVideoEffects, setShowVideoEffects] = useState(false);
+
+  // Waiting room state
+  const [waitingParticipants, setWaitingParticipants] = useState([]);
+  const [hasJoinedCall, setHasJoinedCall] = useState(isHost); // Host joins immediately
 
   // Handle video pinning
   const handlePinVideo = (streamToPin) => {
@@ -213,9 +217,33 @@ function Room({ roomId, name }) {
         const socketConnection = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000");
         setSocket(socketConnection);
 
-        socketConnection.emit("join-room", roomId);
+        if (isHost) {
+          socketConnection.emit("join-room", roomId);
+        } else {
+          socketConnection.emit("request-to-join", { roomId, name });
+        }
 
         // Socket event listeners - now safe to create peers since stream is ready
+        socketConnection.on("request-to-join", ({ userId, name }) => {
+          if (isHost) {
+            setWaitingParticipants(prev => [...prev, { id: userId, name }]);
+          }
+        });
+
+        socketConnection.on("accept-join", () => {
+          if (!isHost) {
+            setHasJoinedCall(true);
+            socketConnection.emit("join-room", roomId);
+          }
+        });
+
+        socketConnection.on("reject-join", () => {
+          if (!isHost) {
+            alert("Your request to join was rejected by the host.");
+            // Redirect back to home or handle rejection
+          }
+        });
+
         socketConnection.on("user-joined", (userId) => {
           console.log("User joined:", userId);
           // Create peer for new user
@@ -362,42 +390,51 @@ function Room({ roomId, name }) {
 
   return (
     <div className="room-container">
-      <div className="video-layout">
-        {/* Main video area */}
-        {totalStreams > 0 && (
-          <div className="main-video-area">
-            {currentMainStream && (
-              <VideoBox
-                stream={currentMainStream}
-                name={currentMainStream === stream ? name : `Participant ${Object.keys(remoteStreams).find(key => remoteStreams[key] === currentMainStream) || 'Unknown'}`}
-                isMain={true}
-                isPinned={pinnedStream === currentMainStream}
-                onPin={() => handlePinVideo(currentMainStream)}
-                onClick={() => handleVideoClick(currentMainStream)}
-                isLocal={currentMainStream === stream}
-              />
+      {!hasJoinedCall ? (
+        <div className="waiting-room">
+          <h2>Waiting for host approval...</h2>
+          <p>You've requested to join the meeting. Please wait for the host to accept your request.</p>
+        </div>
+      ) : (
+        <>
+          <div className="video-layout">
+            {/* Main video area */}
+            {totalStreams > 0 && (
+              <div className="main-video-area">
+                {currentMainStream && (
+                  <VideoBox
+                    stream={currentMainStream}
+                    name={currentMainStream === stream ? name : `Participant ${Object.keys(remoteStreams).find(key => remoteStreams[key] === currentMainStream) || 'Unknown'}`}
+                    isMain={true}
+                    isPinned={pinnedStream === currentMainStream}
+                    onPin={() => handlePinVideo(currentMainStream)}
+                    onClick={() => handleVideoClick(currentMainStream)}
+                    isLocal={currentMainStream === stream}
+                  />
+                )}
+              </div>
+            )}
+
+            {/* Grid area for other videos */}
+            {gridStreams.length > 0 && (
+              <div className="video-grid">
+                {gridStreams.map((gridStream, index) => (
+                  <VideoBox
+                    key={index}
+                    stream={gridStream}
+                    name={gridStream === stream ? name : `Participant ${Object.keys(remoteStreams).find(key => remoteStreams[key] === gridStream) || 'Unknown'}`}
+                    isMain={false}
+                    isPinned={pinnedStream === gridStream}
+                    onPin={() => handlePinVideo(gridStream)}
+                    onClick={() => handleVideoClick(gridStream)}
+                    isLocal={gridStream === stream}
+                  />
+                ))}
+              </div>
             )}
           </div>
-        )}
-
-        {/* Grid area for other videos */}
-        {gridStreams.length > 0 && (
-          <div className="video-grid">
-            {gridStreams.map((gridStream, index) => (
-              <VideoBox
-                key={index}
-                stream={gridStream}
-                name={gridStream === stream ? name : `Participant ${Object.keys(remoteStreams).find(key => remoteStreams[key] === gridStream) || 'Unknown'}`}
-                isMain={false}
-                isPinned={pinnedStream === gridStream}
-                onPin={() => handlePinVideo(gridStream)}
-                onClick={() => handleVideoClick(gridStream)}
-                isLocal={gridStream === stream}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+        </>
+      )}
       <Controls
         stream={stream}
         socket={socket}
@@ -420,7 +457,14 @@ function Room({ roomId, name }) {
 
       {showParticipants && (
         <div className="side-panel participants-panel">
-          <Participants socket={socket} roomId={roomId} onClose={() => setShowParticipants(false)} />
+          <Participants
+            socket={socket}
+            roomId={roomId}
+            onClose={() => setShowParticipants(false)}
+            isHost={isHost}
+            waitingParticipants={waitingParticipants}
+            setWaitingParticipants={setWaitingParticipants}
+          />
         </div>
       )}
 

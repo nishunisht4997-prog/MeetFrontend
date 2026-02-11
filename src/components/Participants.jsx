@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "../styles/participants.css";
 
-function Participants({ socket, roomId, onClose }) {
+function Participants({ socket, roomId, onClose, isHost, waitingParticipants, setWaitingParticipants }) {
   const [participants, setParticipants] = useState([]);
 
   useEffect(() => {
@@ -25,6 +25,20 @@ function Participants({ socket, roomId, onClose }) {
     return colors[index];
   };
 
+  const handleAccept = (userId) => {
+    if (socket) {
+      socket.emit("accept-join", { roomId, userId });
+      setWaitingParticipants(prev => prev.filter(p => p.id !== userId));
+    }
+  };
+
+  const handleReject = (userId) => {
+    if (socket) {
+      socket.emit("reject-join", { roomId, userId });
+      setWaitingParticipants(prev => prev.filter(p => p.id !== userId));
+    }
+  };
+
   return (
     <div className="participants">
       <div className="participants-header">
@@ -41,6 +55,39 @@ function Participants({ socket, roomId, onClose }) {
         </div>
         <span className="participant-count">{participants.length}</span>
       </div>
+
+      {isHost && waitingParticipants.length > 0 && (
+        <div className="waiting-participants-section">
+          <h4>Waiting to join</h4>
+          <div className="waiting-list">
+            {waitingParticipants.map((participant) => (
+              <div key={participant.id} className="waiting-participant-item">
+                <div
+                  className="participant-avatar"
+                  style={{ backgroundColor: getRandomColor(participant.name) }}
+                >
+                  {getInitials(participant.name)}
+                </div>
+                <span className="participant-name">{participant.name}</span>
+                <div className="waiting-actions">
+                  <button
+                    className="accept-btn"
+                    onClick={() => handleAccept(participant.id)}
+                  >
+                    Accept
+                  </button>
+                  <button
+                    className="reject-btn"
+                    onClick={() => handleReject(participant.id)}
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="participants-list">
         {participants.map((participant) => (
