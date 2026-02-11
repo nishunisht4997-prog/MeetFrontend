@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
+import socket from "../socket/socket.js";
 import VideoBox from "../components/VideoBox";
 import Controls from "../components/Controls";
 import Chat from "../components/Chat";
@@ -11,7 +11,6 @@ import "../styles/room.css";
 
 function Room({ roomId, name, isHost }) {
   const [stream, setStream] = useState(null);
-  const [socket, setSocket] = useState(null);
   const peerRef = useRef(null);
   const peersRef = useRef({});
   const [remoteStreams, setRemoteStreams] = useState({});
@@ -213,9 +212,8 @@ function Room({ roomId, name, isHost }) {
         setStream(mediaStream);
         streamRef.current = mediaStream;
 
-        // Then connect to socket
-        const socketConnection = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000");
-        setSocket(socketConnection);
+        // Use the imported socket
+        const socketConnection = socket;
 
         if (isHost) {
           socketConnection.emit("join-room", roomId);

@@ -118,7 +118,7 @@ function RoomInfo({ roomId, onClose }) {
           <div className="security-text">
             <p>Anyone with the meeting link can join</p>
             <p className="security-subtitle">
-              This meeting is protected by standard Google Meet security settings
+              This meeting is protected by standard  Meet security settings
             </p>
           </div>
         </div>

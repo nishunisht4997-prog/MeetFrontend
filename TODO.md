@@ -12,3 +12,9 @@
 - [x] Adjust text colors for contrast (h1 to #333, instructions to #666)
 - [x] Reduce overall shadows and gradients for cleaner style
 - [ ] Reduce the size of the video icon in the heading from 32x32 to 24x24
+
+# TODO: Fix Participants Join Issue
+
+- [x] Fix inconsistent socket connections by using imported socket from socket.js instead of creating new io connection in Room.jsx
+- [x] Remove duplicate socket state and setSocket call in Room.jsx
+- [x] Ensure all components use the same socket instance for consistent backend communication
