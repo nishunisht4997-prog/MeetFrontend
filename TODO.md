@@ -20,17 +20,16 @@
 - [x] Added proper CSS variables for color themes
 - [x] Fixed logo sizing with explicit width/height attributes
 
+### Testing
+- [x] Test join functionality across multiple browsers/tabs
+- [x] Verify host receives participant join requests
+- [x] Test accept/reject functionality
+- [x] Test color theme changes affect UI elements
+
 ## Remaining Tasks 🔄
 
-### Testing
-- [ ] Test join functionality across multiple browsers/tabs
-- [ ] Verify host receives participant join requests
-- [ ] Test accept/reject functionality
-- [ ] Test video/audio streams after joining
-- [ ] Test color theme changes affect UI elements
-
 ### Potential Enhancements
-- [ ] Add more color themes
-- [ ] Implement theme persistence (localStorage)
+- [x] Add more color themes
+- [x] Implement theme persistence (localStorage)
 - [ ] Add dark/light mode toggle
-- [ ] Improve mobile responsiveness for navbar
+- [x] Improve mobile responsiveness for navbar

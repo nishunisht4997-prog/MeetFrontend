@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import logo from '../assets/react.svg';
 
 function Navbar() {
-  const [selectedColor, setSelectedColor] = useState('#E91282');
+  const [selectedColor, setSelectedColor] = useState(() => {
+    return localStorage.getItem('selectedThemeColor') || '#E91282';
+  });
 
   const colors = [
     { name: 'rosa-intenso', hex: '#E91282' },
@@ -14,6 +16,12 @@ function Navbar() {
     { name: 'rosa-pastel', hex: '#FFB6C1' },
     { name: 'azul-cielo', hex: '#87CEEB' },
     { name: 'verde-menta', hex: '#00FA9A' },
+    { name: 'rojo-pasion', hex: '#DC143C' },
+    { name: 'turquesa', hex: '#40E0D0' },
+    { name: 'lavanda', hex: '#E6E6FA' },
+    { name: 'oro', hex: '#FFD700' },
+    { name: 'esmeralda', hex: '#50C878' },
+    { name: 'violeta', hex: '#8B00FF' },
   ];
 
   const handleColorChange = (hex) => {

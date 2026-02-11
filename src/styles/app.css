@@ -600,3 +600,34 @@ ul, ol {
 body {
   padding-top: 60px;
 }
+
+/* Mobile responsiveness for navbar */
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .color-palette {
+    justify-content: center;
+  }
+
+  .navbar-title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 8px 15px;
+  }
+
+  .navbar-title {
+    font-size: 18px;
+  }
+
+  .color-option {
+    width: 25px;
+    height: 25px;
+  }
+}
