@@ -1,12 +1,13 @@
 import { useState } from "react";
 import "../styles/controls.css";
 
-function Controls({ stream, socket, roomId, onToggleChat, onToggleParticipants, onToggleRoomInfo, onToggleVideoEffects, isScreenSharing, onToggleScreenShare }) {
+function Controls({ stream, socket, roomId, onToggleChat, onToggleParticipants, onToggleRoomInfo, onToggleVideoEffects, isScreenSharing, onToggleScreenShare, onVideoQualityChange, currentVideoQuality = 'hd' }) {
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isHandRaised, setIsHandRaised] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [showQualityOptions, setShowQualityOptions] = useState(false);
 
   const toggleMute = () => {
     const audioTrack = stream?.getAudioTracks()[0];

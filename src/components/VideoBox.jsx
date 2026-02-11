@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-function VideoBox({ stream, name, isMain = false, isPinned = false, onPin, onClick, isLocal = false }) {
+function VideoBox({ stream, name, isMain = false, isPinned = false, onPin, onClick, isLocal = false, connectionQuality = 'good', isSpeaking = false, audioLevel = 0 }) {
   const videoRef = useRef();
   const [hasVideo, setHasVideo] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -24,9 +24,36 @@ function VideoBox({ stream, name, isMain = false, isPinned = false, onPin, onCli
     return colors[index];
   };
 
+  const getConnectionQualityIcon = (quality) => {
+    switch (quality) {
+      case 'excellent': return '🟢';
+      case 'good': return '🟡';
+      case 'poor': return '🔴';
+      default: return '⚪';
+    }
+  };
+
+  const renderAudioVisualizer = () => {
+    if (!isSpeaking || audioLevel === 0) return null;
+
+    const bars = [];
+    const numBars = 5;
+    for (let i = 0; i < numBars; i++) {
+      const height = Math.max(2, audioLevel * 20 * (1 - i * 0.2));
+      bars.push(
+        <div
+          key={i}
+          className="audio-bar"
+          style={{ height: `${height}px` }}
+        />
+      );
+    }
+    return <div className="audio-visualizer">{bars}</div>;
+  };
+
   return (
     <div
-      className={`video-wrapper ${isMain ? 'main-video' : ''} ${isPinned ? 'pinned' : ''} ${isMinimized ? 'minimized' : ''} ${isMaximized ? 'maximized' : ''}`}
+      className={`video-wrapper ${isMain ? 'main-video' : ''} ${isPinned ? 'pinned' : ''} ${isMinimized ? 'minimized' : ''} ${isMaximized ? 'maximized' : ''} ${isSpeaking ? 'speaking' : ''}`}
       onClick={onClick}
     >
       {hasVideo ? (
@@ -51,6 +78,14 @@ function VideoBox({ stream, name, isMain = false, isPinned = false, onPin, onCli
           {isLocal && <span className="local-indicator">(You)</span>}
         </div>
       )}
+
+      {!isLocal && connectionQuality && (
+        <div className="connection-indicator" title={`Connection: ${connectionQuality}`}>
+          {getConnectionQualityIcon(connectionQuality)}
+        </div>
+      )}
+
+      {renderAudioVisualizer()}
 
       {!isLocal && onPin && (
         <button

@@ -18,3 +18,13 @@
 - [x] Fix inconsistent socket connections by using imported socket from socket.js instead of creating new io connection in Room.jsx
 - [x] Remove duplicate socket state and setSocket call in Room.jsx
 - [x] Ensure all components use the same socket instance for consistent backend communication
+
+# TODO: Enhance Video Call Features
+
+- [ ] Add network quality indicators (connection strength) for each participant
+- [ ] Implement spotlight mode for better focus on active speakers
+- [ ] Add audio level visualization (waveform bars) for active speakers
+- [ ] Improve video quality controls (resolution switching)
+- [ ] Add participant count badges and better grid layouts for large meetings
+- [ ] Enhance mobile responsiveness for video controls
+- [ ] Add video stability features (freeze detection, reconnection)

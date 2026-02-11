@@ -30,6 +30,16 @@ function Room({ roomId, name, isHost }) {
   const [waitingParticipants, setWaitingParticipants] = useState([]);
   const [hasJoinedCall, setHasJoinedCall] = useState(isHost); // Host joins immediately
 
+  // Enhanced video call features
+  const [spotlightMode, setSpotlightMode] = useState(false);
+  const [activeSpeaker, setActiveSpeaker] = useState(null);
+  const [videoQuality, setVideoQuality] = useState('hd');
+  const [connectionQualities, setConnectionQualities] = useState({});
+  const [audioLevels, setAudioLevels] = useState({});
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const animationFrameRef = useRef(null);
+
   // Handle video pinning
   const handlePinVideo = (streamToPin) => {
     if (pinnedStream === streamToPin) {
@@ -45,6 +55,115 @@ function Room({ roomId, name, isHost }) {
   const handleVideoClick = (streamToMain) => {
     if (!pinnedStream) {
       setMainStream(streamToMain);
+    }
+  };
+
+  // Handle spotlight mode toggle
+  const handleToggleSpotlight = () => {
+    setSpotlightMode(!spotlightMode);
+    if (!spotlightMode && activeSpeaker) {
+      setMainStream(activeSpeaker);
+    }
+  };
+
+  // Handle video quality change
+  const handleVideoQualityChange = (quality) => {
+    setVideoQuality(quality);
+    // Apply quality settings to video tracks
+    const videoTrack = streamRef.current?.getVideoTracks()[0];
+    if (videoTrack) {
+      const constraints = {
+        width: quality === 'hd' ? 1280 : quality === 'sd' ? 640 : 320,
+        height: quality === 'hd' ? 720 : quality === 'sd' ? 480 : 240,
+        frameRate: quality === 'hd' ? 30 : 15
+      };
+      videoTrack.applyConstraints(constraints).catch(console.error);
+    }
+  };
+
+  // Monitor connection quality
+  const monitorConnectionQuality = (peerId, peer) => {
+    const updateQuality = () => {
+      if (peer.connectionState === 'connected') {
+        // Simple quality indicator based on connection state
+        const quality = peer.iceConnectionState === 'connected' ? 'good' :
+                       peer.iceConnectionState === 'completed' ? 'excellent' : 'poor';
+        setConnectionQualities(prev => ({ ...prev, [peerId]: quality }));
+      }
+    };
+
+    peer.addEventListener('connectionstatechange', updateQuality);
+    peer.addEventListener('iceconnectionstatechange', updateQuality);
+  };
+
+  // Audio level monitoring for active speaker detection
+  const startAudioMonitoring = () => {
+    if (!streamRef.current) return;
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const analyser = audioContext.createAnalyser();
+    const microphone = audioContext.createMediaStreamSource(streamRef.current);
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.8;
+    microphone.connect(analyser);
+
+    audioContextRef.current = audioContext;
+    analyserRef.current = analyser;
+
+    const updateAudioLevels = () => {
+      analyser.getByteFrequencyData(dataArray);
+      const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+      const normalizedLevel = average / 255;
+
+      setAudioLevels(prev => ({ ...prev, local: normalizedLevel }));
+
+      // Detect active speaker
+      if (normalizedLevel > 0.1) {
+        setActiveSpeaker(streamRef.current);
+        if (spotlightMode) {
+          setMainStream(streamRef.current);
+        }
+      }
+
+      animationFrameRef.current = requestAnimationFrame(updateAudioLevels);
+    };
+
+    updateAudioLevels();
+  };
+
+  // Freeze detection for video stability
+  const detectVideoFreeze = (videoElement, streamId) => {
+    let lastFrameTime = Date.now();
+    let freezeCount = 0;
+
+    const checkFreeze = () => {
+      const currentTime = Date.now();
+      if (currentTime - lastFrameTime > 3000) { // 3 seconds without frame update
+        freezeCount++;
+        if (freezeCount > 2) {
+          console.warn(`Video freeze detected for stream ${streamId}, attempting reconnection`);
+          // Trigger reconnection logic here
+          handlePeerReconnect(streamId);
+        }
+      } else {
+        freezeCount = 0;
+      }
+      lastFrameTime = currentTime;
+    };
+
+    const interval = setInterval(checkFreeze, 1000);
+    return () => clearInterval(interval);
+  };
+
+  // Handle peer reconnection
+  const handlePeerReconnect = (userId) => {
+    const peer = peersRef.current[userId];
+    if (peer && peer.connectionState === 'failed') {
+      console.log(`Attempting to reconnect peer ${userId}`);
+      // Implement reconnection logic
+      peer.restartIce();
     }
   };
 
@@ -211,6 +330,9 @@ function Room({ roomId, name, isHost }) {
         });
         setStream(mediaStream);
         streamRef.current = mediaStream;
+
+        // Start audio monitoring for active speaker detection
+        startAudioMonitoring();
 
         // Use the imported socket
         const socketConnection = socket;
@@ -408,14 +530,24 @@ function Room({ roomId, name, isHost }) {
                     onPin={() => handlePinVideo(currentMainStream)}
                     onClick={() => handleVideoClick(currentMainStream)}
                     isLocal={currentMainStream === stream}
+                    connectionQuality={currentMainStream === stream ? 'excellent' : (connectionQualities[Object.keys(remoteStreams).find(key => remoteStreams[key] === currentMainStream)] || 'good')}
+                    isSpeaking={activeSpeaker === currentMainStream}
+                    audioLevel={currentMainStream === stream ? audioLevels.local || 0 : (audioLevels[Object.keys(remoteStreams).find(key => remoteStreams[key] === currentMainStream)] || 0)}
                   />
                 )}
               </div>
             )}
 
+            {/* Participant count badge */}
+            {totalStreams > 1 && (
+              <div className="participant-count-badge">
+                {totalStreams} participants
+              </div>
+            )}
+
             {/* Grid area for other videos */}
             {gridStreams.length > 0 && (
-              <div className="video-grid">
+              <div className={`video-grid ${totalStreams > 6 ? 'large-meeting' : ''}`}>
                 {gridStreams.map((gridStream, index) => (
                   <VideoBox
                     key={index}
@@ -426,6 +558,9 @@ function Room({ roomId, name, isHost }) {
                     onPin={() => handlePinVideo(gridStream)}
                     onClick={() => handleVideoClick(gridStream)}
                     isLocal={gridStream === stream}
+                    connectionQuality={gridStream === stream ? 'excellent' : (connectionQualities[Object.keys(remoteStreams).find(key => remoteStreams[key] === gridStream)] || 'good')}
+                    isSpeaking={activeSpeaker === gridStream}
+                    audioLevel={gridStream === stream ? audioLevels.local || 0 : (audioLevels[Object.keys(remoteStreams).find(key => remoteStreams[key] === gridStream)] || 0)}
                   />
                 ))}
               </div>
