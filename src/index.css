@@ -11,6 +11,18 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Color palette variables */
+  --rosa-intenso: #E91282;
+  --azul-electrico: #00BFFF;
+  --verde-lima: #32CD32;
+  --amarillo-neon: #FFFF00;
+  --naranja-vibrante: #FF4500;
+  --morado-profundo: #8A2BE2;
+  --rosa-pastel: #FFB6C1;
+  --azul-cielo: #87CEEB;
+  --verde-menta: #00FA9A;
+  --primary-color: var(--rosa-intenso);
 }
 
 a {

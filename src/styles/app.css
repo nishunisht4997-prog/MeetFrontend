@@ -62,7 +62,7 @@ button {
   cursor: pointer;
   border-radius: 12px;
   border: none;
-  background: #007bff;
+  background: var(--primary-color);
   color: white;
   font-weight: 600;
   transition: all 0.3s ease;
@@ -71,7 +71,8 @@ button {
 }
 
 button:hover {
-  background: #0056b3;
+  background: var(--primary-color);
+  filter: brightness(0.8);
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   transform: translateY(-2px);
 }
@@ -530,4 +531,72 @@ ul, ol {
   background: #5a6268;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Navbar styles */
+.navbar {
+  background-color: #1e293b;
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-logo img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.navbar-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+}
+
+.color-palette {
+  display: flex;
+  gap: 8px;
+}
+
+.color-option {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent !important;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+  border-color: white;
+}
+
+.color-option.selected {
+  border-color: white;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Adjust body padding for fixed navbar */
+body {
+  padding-top: 60px;
 }

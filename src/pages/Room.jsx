@@ -337,13 +337,14 @@ function Room({ roomId, name, isHost }) {
         // Use the imported socket
         const socketConnection = socket;
 
-        if (isHost) {
-          socketConnection.emit("join-room", roomId);
-        } else {
-          socketConnection.emit("request-to-join", { roomId, name });
-        }
-
         // Socket event listeners - now safe to create peers since stream is ready
+        socketConnection.on('connect', () => {
+          if (isHost) {
+            socketConnection.emit("join-room", roomId);
+          } else {
+            socketConnection.emit("request-to-join", { roomId, name });
+          }
+        });
         socketConnection.on("request-to-join", ({ userId, name }) => {
           if (isHost) {
             setWaitingParticipants(prev => [...prev, { id: userId, name }]);

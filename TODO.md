@@ -1,30 +1,36 @@
-# TODO: Modernize Home Page UI
+# Meet Frontend TODO
 
-- [x] Reduce .home-container max-width from 500px to 400px and padding from 40px to 30px
-- [x] Remove 3D transforms (rotateX, translateZ) from h1 for flat modern look
-- [x] Remove 3D transforms from .instructions
-- [x] Simplify button hover effects: remove 3D rotations and scaling, keep subtle shadows
-- [x] Change body background from #dfb6b2 to #f8f9fa
-- [x] Change .center background to #f8f9fa
-- [x] Change .home-container background to white with subtle border
-- [x] Change button colors from #824d69 to #007bff, hover to #0056b3
-- [x] Change input backgrounds to #ffffff, borders to #dee2e6
-- [x] Adjust text colors for contrast (h1 to #333, instructions to #666)
-- [x] Reduce overall shadows and gradients for cleaner style
-- [ ] Reduce the size of the video icon in the heading from 32x32 to 24x24
+## Completed Tasks ✅
 
-# TODO: Fix Participants Join Issue
+### Socket Connection Fix
+- [x] Fixed socket connection issue where participants couldn't join
+- [x] Moved socket emits to 'connect' event listener to ensure connection is established before emitting join events
+- [x] Host now receives join request messages from participants
+- [x] Participants can now successfully join meetings
 
-- [x] Fix inconsistent socket connections by using imported socket from socket.js instead of creating new io connection in Room.jsx
-- [x] Remove duplicate socket state and setSocket call in Room.jsx
-- [x] Ensure all components use the same socket instance for consistent backend communication
+### Navbar Enhancement
+- [x] Created Navbar component with logo and color theme selector
+- [x] Added 9 different color themes (rosa-intenso, azul-electrico, verde-lima, etc.)
+- [x] Implemented dynamic color changing functionality
+- [x] Updated CSS variables and button styles to use selected theme color
+- [x] Added navbar to App.jsx and styled it as fixed header
 
-# TODO: Enhance Video Call Features
+### Code Improvements
+- [x] Updated main.jsx to import index.css
+- [x] Added proper CSS variables for color themes
+- [x] Fixed logo sizing with explicit width/height attributes
 
-- [ ] Add network quality indicators (connection strength) for each participant
-- [ ] Implement spotlight mode for better focus on active speakers
-- [ ] Add audio level visualization (waveform bars) for active speakers
-- [ ] Improve video quality controls (resolution switching)
-- [ ] Add participant count badges and better grid layouts for large meetings
-- [ ] Enhance mobile responsiveness for video controls
-- [ ] Add video stability features (freeze detection, reconnection)
+## Remaining Tasks 🔄
+
+### Testing
+- [ ] Test join functionality across multiple browsers/tabs
+- [ ] Verify host receives participant join requests
+- [ ] Test accept/reject functionality
+- [ ] Test video/audio streams after joining
+- [ ] Test color theme changes affect UI elements
+
+### Potential Enhancements
+- [ ] Add more color themes
+- [ ] Implement theme persistence (localStorage)
+- [ ] Add dark/light mode toggle
+- [ ] Improve mobile responsiveness for navbar
