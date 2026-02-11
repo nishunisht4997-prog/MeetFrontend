@@ -8,12 +8,13 @@
 - [x] Host now receives join request messages from participants
 - [x] Participants can now successfully join meetings
 
-### Navbar Enhancement
-- [x] Created Navbar component with logo and color theme selector
-- [x] Added 9 different color themes (rosa-intenso, azul-electrico, verde-lima, etc.)
-- [x] Implemented dynamic color changing functionality
-- [x] Updated CSS variables and button styles to use selected theme color
-- [x] Added navbar to App.jsx and styled it as fixed header
+### Navbar Removal and Theme Enhancement
+- [x] Removed fixed navbar from App.jsx for cleaner interface
+- [x] Created floating ThemeSelector component with 15 vibrant color options
+- [x] Added theme selector to Room page with glassmorphism styling
+- [x] Implemented dynamic color changing with localStorage persistence
+- [x] Added mobile-responsive theme selector with smooth animations
+- [x] Updated CSS with modern effects and removed navbar-related styles
 
 ### Code Improvements
 - [x] Updated main.jsx to import index.css

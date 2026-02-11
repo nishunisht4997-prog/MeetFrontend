@@ -2,7 +2,6 @@
 import { useState } from "react";
 import Home from "./pages/Home";
 import Room from "./pages/Room";
-import Navbar from "./components/Navbar";
 
 function App() {
   const [roomId, setRoomId] = useState(null);
@@ -11,7 +10,6 @@ function App() {
 
   return (
     <>
-      <Navbar />
       {!roomId ? (
         <Home setRoomId={setRoomId} setName={setName} setIsHost={setIsHost} />
       ) : (
