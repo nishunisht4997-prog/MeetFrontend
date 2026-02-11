@@ -27,6 +27,13 @@
 - [x] Test accept/reject functionality
 - [x] Test color theme changes affect UI elements
 
+## Theme Selector Removal ✅
+
+- [x] Remove ThemeSelector import from src/pages/Room.jsx
+- [x] Remove <ThemeSelector /> JSX element from Room component
+- [x] Delete src/components/ThemeSelector.jsx file
+- [x] Update TODO.md to mark theme selector removal as completed
+
 ## Remaining Tasks 🔄
 
 ### Potential Enhancements

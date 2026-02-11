@@ -6,7 +6,7 @@ import Chat from "../components/Chat";
 import Participants from "../components/Participants";
 import RoomInfo from "../components/RoomInfo";
 import VideoEffects from "../components/VideoEffects";
-import ThemeSelector from "../components/ThemeSelector";
+
 import { createPeer } from "../webrtc/peer";
 import "../styles/room.css";
 
@@ -519,7 +519,6 @@ function Room({ roomId, name, isHost }) {
         </div>
       ) : (
         <>
-          <ThemeSelector />
           <div className="video-layout">
             {/* Main video area */}
             {totalStreams > 0 && (
