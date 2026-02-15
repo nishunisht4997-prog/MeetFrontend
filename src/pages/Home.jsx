@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createMeeting } from "../api/meetingApi";
+import { createMeeting, joinMeeting } from "../api/meetingApi";
 
 function Home({ setRoomId, setName, setIsHost }) {
   const [joinRoomId, setJoinRoomId] = useState("");
@@ -25,7 +25,7 @@ function Home({ setRoomId, setName, setIsHost }) {
   };
 
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     if (!participantName.trim()) {
       setError("Please enter your name.");
       return;
@@ -35,6 +35,14 @@ function Home({ setRoomId, setName, setIsHost }) {
       return;
     }
     setError("");
+    
+    // Validate room exists before joining
+    const result = await joinMeeting(joinRoomId, participantName);
+    if (!result.success) {
+      setError(result.message || "Meeting not found. Please check the meeting ID.");
+      return;
+    }
+    
     setName(participantName);
     setRoomId(joinRoomId);
   };

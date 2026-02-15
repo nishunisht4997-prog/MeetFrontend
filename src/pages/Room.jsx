@@ -321,6 +321,15 @@ function Room({ roomId, name, isHost }) {
     }
   };
 
+  // Function to handle joining the room via socket
+  const joinRoomViaSocket = (socketConnection) => {
+    if (isHost) {
+      socketConnection.emit("join-room", roomId);
+    } else {
+      socketConnection.emit("request-to-join", { roomId, name });
+    }
+  };
+
   useEffect(() => {
     const initializeRoom = async () => {
       try {
@@ -339,20 +348,28 @@ function Room({ roomId, name, isHost }) {
         const socketConnection = socket;
 
         // Socket event listeners - now safe to create peers since stream is ready
-        socketConnection.on('connect', () => {
-          if (isHost) {
-            socketConnection.emit("join-room", roomId);
-          } else {
-            socketConnection.emit("request-to-join", { roomId, name });
-          }
-        });
+        // Handle connection - emit events whether already connected or when connecting
+        const handleConnection = () => {
+          console.log("Socket connected, joining room:", roomId);
+          joinRoomViaSocket(socketConnection);
+        };
+
+        // Check if socket is already connected
+        if (socketConnection.connected) {
+          handleConnection();
+        } else {
+          socketConnection.on('connect', handleConnection);
+        }
+
         socketConnection.on("request-to-join", ({ userId, name }) => {
+          console.log("Join request received from:", userId, name);
           if (isHost) {
             setWaitingParticipants(prev => [...prev, { id: userId, name }]);
           }
         });
 
         socketConnection.on("accept-join", () => {
+          console.log("Join accepted!");
           if (!isHost) {
             setHasJoinedCall(true);
             socketConnection.emit("join-room", roomId);
@@ -360,6 +377,7 @@ function Room({ roomId, name, isHost }) {
         });
 
         socketConnection.on("reject-join", () => {
+          console.log("Join rejected!");
           if (!isHost) {
             alert("Your request to join was rejected by the host.");
             // Redirect back to home or handle rejection
@@ -519,7 +537,7 @@ function Room({ roomId, name, isHost }) {
         </div>
       ) : (
         <>
-          <div className="video-layout">
+          <div className={`video-layout ${isScreenSharing ? 'screen-sharing' : ''}`}>
             {/* Main video area */}
             {totalStreams > 0 && (
               <div className="main-video-area">
